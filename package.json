@@ -1,0 +1,24 @@
+{
+  "name": "notion-event-publisher",
+  "private": true,
+  "description": "A simple Cloud Run function that detects changes in Notion pages and publishes events to Cloud Pub/Sub.",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "check": "biome check",
+    "format": "biome check --write",
+    "start": "functions-framework --target=pollNotion",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "@google-cloud/functions-framework": "^3.4.4",
+    "@google-cloud/pubsub": "^4.9.0",
+    "@google-cloud/storage": "^7.14.0",
+    "@notionhq/client": "^2.2.15",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.9.4",
+    "vitest": "^2.1.8"
+  }
+}
