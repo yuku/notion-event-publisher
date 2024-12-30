@@ -8,10 +8,38 @@ Notion Event Publisher is a simple Cloud Run function that detects changes in No
   * `NOTION_API_KEY`
   * `DATABASE_ID`
   * `GCS_OBJECT_PATH`
+    * A URI of Cloud Storage object that stores the state of the last run.
 * Optional
   * `PUBSUB_TOPIC` (default: `notion-events`)
 
-## Deplyment
+## Event Message
+
+```ts
+type Message =
+  | PageCreatedMessage
+  | PageUpdatedMessage
+  | PageDeletedMessage
+
+// See https://developers.notion.com/reference/page for the detail
+type Page = { object: "page", id: string }
+
+type PageCreatedMessage = {
+  eventType: "page-created"
+  payload: Page
+}
+
+type PageUpdatedMessage = {
+  eventType: "page-updated"
+  payload: Page
+}
+
+type PageDeletedMessage = {
+  eventType: "page-deleted"
+  payload: { id: string }
+}
+```
+
+## Deployment
 
 Clone this repository then deploy it to Cloud Run functions. Example:
 
@@ -33,4 +61,17 @@ gcloud functions deploy "$FUNCTION_NAME" \
   --set-env-vars=GCS_OBJECT_PATH="$GCS_OBJECT_PATH" \
   --set-env-vars=DATABASE_ID="$DATABASE_ID" \
   --set-secrets=NOTION_API_KEY="${SECRET}:latest"
+```
+
+In addition, you need to set up a Cloud Scheduler to trigger the function periodically. Example:
+
+```bash
+FUNCTION_URL=$(gcloud functions describe "$FUNCTION_NAME" --region="$REGION" --format="value(httpsTrigger.url)")
+
+gcloud scheduler jobs create http notion-event-publisher \
+  --schedule="*/5 * * * *" \
+  --uri="$FUNCTION_URL" \
+  --http-method=POST \
+  --message-body='{}' \
+  --oidc-service-account-email="$FUNCTION_NAME@$PROJECT_ID.iam.gserviceaccount.com"
 ```
