@@ -1,0 +1,12 @@
+.editorconfig
+.envrc
+.gcloudignore
+.git
+.github
+.gitignore
+.tool-versions
+.vscode
+*.test.js
+biome.json
+README.md
+node_modules/
