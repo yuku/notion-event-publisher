@@ -66,7 +66,7 @@ gcloud functions deploy "$FUNCTION_NAME" \
 In addition, you need to set up a Cloud Scheduler to trigger the function periodically. Example:
 
 ```bash
-FUNCTION_URL=$(gcloud functions describe "$FUNCTION_NAME" --region="$REGION" --format="value(httpsTrigger.url)")
+FUNCTION_URL=$(gcloud functions describe "$FUNCTION_NAME" --region="$REGION" --format="value(url)")
 
 gcloud scheduler jobs create http notion-event-publisher \
   --schedule="*/5 * * * *" \
@@ -74,4 +74,13 @@ gcloud scheduler jobs create http notion-event-publisher \
   --http-method=POST \
   --message-body='{}' \
   --oidc-service-account-email="$FUNCTION_NAME@$PROJECT_ID.iam.gserviceaccount.com"
+```
+
+### Trigger the function manually
+
+You can trigger the function manually by sending a request to the function URL. Example:
+
+```bash
+ACCESS_TOKEN=$(gcloud auth print-identity-token)
+curl $FUNCTION_URL -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
