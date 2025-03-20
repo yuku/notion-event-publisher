@@ -176,7 +176,7 @@ async function publishEvents(topic, { created, updated, deleted }, pages) {
   for (const pageId of updated) {
     tasks.push(
       publishMessage(topic, {
-        eventTYpe: "page-updated",
+        eventType: "page-updated",
         payload: pages[pageId],
       }),
     );
