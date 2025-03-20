@@ -76,11 +76,21 @@ gcloud scheduler jobs create http notion-event-publisher \
   --oidc-service-account-email="$FUNCTION_NAME@$PROJECT_ID.iam.gserviceaccount.com"
 ```
 
-### Trigger the function manually
+## How to
+
+### Trigger the Function Manually
 
 You can trigger the function manually by sending a request to the function URL. Example:
 
 ```bash
 ACCESS_TOKEN=$(gcloud auth print-identity-token)
-curl $FUNCTION_URL -H "Authorization: Bearer $ACCESS_TOKEN"
+curl "$FUNCTION_URL" -H "Authorization: Bearer $ACCESS_TOKEN"
+```
+
+### Publish All Pages in the Database As Created Events
+
+Delete the state file in the Cloud Storage bucket to publish all pages in the database as created events. Then, trigger the function manually.
+
+```bash
+gsutil rm "$GCS_OBJECT_PATH"
 ```
