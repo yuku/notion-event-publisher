@@ -4,6 +4,7 @@
   "description": "A simple Cloud Run function that detects changes in Notion pages and publishes events to Cloud Pub/Sub.",
   "type": "module",
   "main": "index.js",
+  "license": "MIT",
   "scripts": {
     "check": "biome check",
     "format": "biome check --write",
