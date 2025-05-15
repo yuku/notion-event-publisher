@@ -21,7 +21,7 @@ functions.http("pollNotion", async (req, res) => {
   try {
     const [prevState, [currentState, pages]] = await Promise.all([
       loadPreviousState(file),
-      fetchCurrentState(notion, process.env.DATABASE_ID),
+      fetchCurrentState(notion),
     ]);
     const { created, updated, deleted } = detectChanges(
       prevState,
@@ -54,22 +54,31 @@ const stateSchema = z.record(z.string());
 /** @typedef {z.infer<typeof stateSchema>} State */
 
 /**
- * fetchCurrentState retrieves the current state of the Notion database.
+ * fetchCurrentState retrieves the current state of the Notion pages
+ * that can be accessed by the API key.
  * @param {import("@notionhq/client").Client} notion
- * @param {string} databaseId
  */
-async function fetchCurrentState(notion, databaseId) {
+async function fetchCurrentState(notion) {
   console.log("Fetching current state from Notion...");
 
   /** @type {State} */
   const currentState = {};
   const pages = {};
 
-  for await (const page of iteratePaginatedAPI(notion.databases.query, {
-    database_id: databaseId,
+  for await (const page of iteratePaginatedAPI(notion.search, {
+    // Specify the sort parameter for improving accuracy.
+    // Not sure this helps, but it doesn't hurt.
+    sort: {
+      timestamp: "last_edited_time",
+      direction: "descending",
+    },
   })) {
+    if (page.object !== "page") continue;
     currentState[page.id] = page.last_edited_time;
     pages[page.id] = page;
+
+    // We don't break here because we want to fetch all pages
+    // in order to detect deleted pages.
   }
 
   return [currentState, pages];

@@ -2,11 +2,16 @@
 
 Notion Event Publisher is a simple Cloud Run function that detects changes in Notion pages and publishes events to [Cloud Pub/Sub](https://cloud.google.com/pubsub).
 
+> [!NOTE]
+>
+> Notion released the [Webhook API](https://developers.notion.com/reference/webhooks) in December 2024.  
+> However, it still does not provide webhooks for when an integration is added to or removed from a page or database. Therefore, this functionality remains useful.
+
 ## Environment Variables
 
 * Required
   * `NOTION_API_KEY`
-  * `DATABASE_ID`
+    * The API key for Notion. This function will detect changes of the pages accessible by this key.  
   * `GCS_OBJECT_PATH`
     * A URI of Cloud Storage object that stores the state of the last run.
 * Optional
@@ -47,7 +52,6 @@ Clone this repository then deploy it to Cloud Run functions. Example:
 FUNCTION_NAME=notion-event-publisher
 REGION=asia-northeast1
 GCS_OBJECT_PATH=gs://yourbucket/path/to/state/file
-DATABASE_ID=YOUR_NOTION_DATABASE_ID
 SECRET=YOUR_SECRET_MANAGER_NAME
 
 gcloud functions deploy "$FUNCTION_NAME" \
@@ -59,7 +63,6 @@ gcloud functions deploy "$FUNCTION_NAME" \
   --entry-point=pollNotion \
   --trigger-http \
   --set-env-vars=GCS_OBJECT_PATH="$GCS_OBJECT_PATH" \
-  --set-env-vars=DATABASE_ID="$DATABASE_ID" \
   --set-secrets=NOTION_API_KEY="${SECRET}:latest"
 ```
 
