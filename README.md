@@ -16,6 +16,8 @@ Notion Event Publisher is a simple Cloud Run function that detects changes in No
     * A URI of Cloud Storage object that stores the state of the last run.
 * Optional
   * `PUBSUB_TOPIC` (default: `notion-events`)
+  * `ARCHIVED_AS_DELETED`, `IN_TRASH_AS_DELETED`
+    * If `"true"`, archived pages and pages in the trash are treated as deleted.
 
 ## Event Message
 

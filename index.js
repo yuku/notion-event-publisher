@@ -74,6 +74,13 @@ async function fetchCurrentState(notion) {
     },
   })) {
     if (page.object !== "page") continue;
+    if (process.env.ARCHIVED_AS_DELETED === "true" && page.archived) {
+      continue;
+    }
+    if (process.env.IN_TRASH_AS_DELETED === "true" && page.in_trash) {
+      continue;
+    }
+
     currentState[page.id] = page.last_edited_time;
     pages[page.id] = page;
 
